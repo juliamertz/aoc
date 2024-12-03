@@ -1,9 +1,9 @@
-use itertools::Itertools;
-
 pub mod a;
 pub mod b;
 
+pub use super::*;
 pub type Report = Vec<u32>;
+
 pub fn parse_input(input: &str) -> Vec<Report> {
     input
         .lines()

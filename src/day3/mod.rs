@@ -1,8 +1,7 @@
 pub mod a;
 pub mod b;
 
-pub use itertools::Itertools;
-
+pub use super::*;
 pub type Input = &'static str;
 
 #[cfg(test)]
@@ -12,7 +11,7 @@ mod test {
     #[test]
     fn part_a() {
         let input = include_str!("./input.txt");
-        assert_eq!(a::solve(input), 175700056);
+        assert_eq!(a::solve(input).unwrap(), 175700056);
     }
 
     #[test]
