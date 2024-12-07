@@ -13,7 +13,7 @@ const DAYS_AMOUNT: usize = 25;
 
 fn main() -> anyhow::Result<()> {
     let input = include_str!("day7/input.txt");
-    day7::Day7::a(day7::Day7::parse_input(input));
+    day7::Day7::b(day7::Day7::parse_input(input));
 
     std::process::exit(0);
 

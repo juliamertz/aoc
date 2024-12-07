@@ -10,6 +10,7 @@ pub type Equasion = (u64, Vec<u64>);
 pub enum Operator {
     Add,
     Multiply,
+    Concat,
 }
 
 impl Operator {
@@ -17,6 +18,7 @@ impl Operator {
         match self {
             Self::Add => a + b,
             Self::Multiply => a * b,
+            Self::Concat => format!("{a}{b}").parse().unwrap()
         }
     }
 }

@@ -2,9 +2,7 @@ use strum::IntoEnumIterator;
 
 use super::*;
 
-fn generate_combinations(n: usize) -> Vec<Vec<Operator>> {
-    let operators = Operator::iter().collect_vec();
-
+fn generate_permutations(n: usize, operators: &[Operator]) -> Vec<Vec<Operator>> {
     let mut result = Vec::new();
     let mut current = vec![0; n];
 
@@ -30,14 +28,15 @@ fn generate_combinations(n: usize) -> Vec<Vec<Operator>> {
     result
 }
 
-pub fn equasion_is_valid(eq: &Equasion) -> bool {
+pub fn equasion_is_valid(eq: &Equasion, operators: &[Operator]) -> bool {
     let (answer, values) = eq;
-    let operators = generate_combinations(values.len() - 1);
+    let permutations = generate_permutations(values.len() - 1, operators);
 
-    for combination in operators.iter() {
+    for permutation in permutations.iter() {
         let mut buf = values.clone();
         let mut i = 0;
-        while i < &operators.len() - 1 {
+
+        while i < &permutations.len() - 1 {
             let curr = buf[i];
 
             if i + 1 == buf.len() {
@@ -45,7 +44,7 @@ pub fn equasion_is_valid(eq: &Equasion) -> bool {
             }
 
             let next = buf[i + 1];
-            let res = combination[i].apply(&curr, &next);
+            let res = permutation[i].apply(&curr, &next);
             if &res > answer {
                 i += 1;
                 continue;
@@ -54,7 +53,6 @@ pub fn equasion_is_valid(eq: &Equasion) -> bool {
             i += 1
         }
 
-        // dbg!(&buf);
         if buf.last().unwrap() == answer {
             return true;
         }
@@ -64,10 +62,11 @@ pub fn equasion_is_valid(eq: &Equasion) -> bool {
 }
 
 pub fn solve(input: Input) -> u64 {
+    let operators = &[Operator::Add, Operator::Multiply];
     let mut ans = 0;
 
     for eq in input {
-        if equasion_is_valid(&eq) {
+        if equasion_is_valid(&eq, operators) {
             ans += eq.0;
         };
     }
