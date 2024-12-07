@@ -1,14 +1,28 @@
 pub mod a;
 pub mod b;
 
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 pub use super::*;
 
 pub type Pos = (usize, usize);
 pub type Board = Grid<Tile>;
+pub type Placed = bool;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Tile {
+    /// Placed indicates if it has been manually placed to obstruct the gaurds path
+    Obstacle(Placed),
+    Guard(Orientation),
+    Empty,
+    Visited,
+
+    // part b pretty printing purposes
+    VisitedFacing(Orientation),
+    Corner,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum Orientation {
     Up,
     Down,
@@ -41,13 +55,13 @@ impl Orientation {
         }
     }
 
-    pub fn move_pos(&self, (x, y): Pos) -> Pos {
-        match self {
-            Self::Up => (x, y - 1),
+    pub fn move_pos(&self, (x, y): Pos) -> Option<Pos> {
+        Some(match self {
+            Self::Up => (x, y.checked_sub(1)?),
             Self::Down => (x, y + 1),
-            Self::Left => (x - 1, y),
+            Self::Left => (x.checked_sub(1)?, y),
             Self::Right => (x + 1, y),
-        }
+        })
     }
 }
 
@@ -65,21 +79,13 @@ impl FromStr for Orientation {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Tile {
-    Obstacle,
-    Guard(Orientation),
-    Empty,
-    Visited,
-}
-
 impl FromStr for Tile {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Ok(match s {
             "." => Tile::Empty,
-            "#" => Tile::Obstacle,
+            "#" => Tile::Obstacle(false),
             _ => Tile::Guard(Orientation::from_str(s)?),
         })
     }
@@ -92,21 +98,28 @@ impl Display for Tile {
             "{}",
             match self {
                 Tile::Empty => ".".to_string(),
-                Tile::Obstacle => "#".to_string(),
+                Tile::Obstacle(placed) => match placed {
+                    false => "#".to_string(),
+                    true => "O".to_string(),
+                },
                 Tile::Guard(ref or) => or.to_string(),
                 Tile::Visited => "X".to_string(),
+                Tile::Corner => "+".to_string(),
+                Tile::VisitedFacing(o) => match o {
+                    Orientation::Left | Orientation::Right => "-".to_string(),
+                    Orientation::Up | Orientation::Down => "|".to_string(),
+                },
             }
         )
     }
 }
 
-fn parse_input(input: &str) -> Board {
+pub fn parse_input(input: &str) -> Board {
     Grid::new(
         input
             .split("\n")
             .filter(|l| !l.is_empty())
             .map(|l| {
-                dbg!(l);
                 l.split("")
                     .filter_map(|ch| Tile::from_str(ch).ok())
                     .collect_vec()
@@ -125,9 +138,9 @@ mod test {
         assert_eq!(a::solve(input), 4977);
     }
 
-    // #[test]
-    // fn part_b() {
-    //     let input = parse_input(include_str!("./input.test.txt"));
-    //     assert_eq!(b::solve(input), 20351745);
-    // }
+    #[test]
+    fn part_b() {
+        let input = parse_input(include_str!("./input.test.txt"));
+        assert_eq!(b::solve(input), 6);
+    }
 }
