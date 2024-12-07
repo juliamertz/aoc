@@ -2,46 +2,68 @@ use strum::IntoEnumIterator;
 
 use super::*;
 
-pub fn make_operator_comb(n: usize) -> Vec<Operator> {
-    let mut buf: Vec<Operator> = vec![];
+fn generate_combinations(n: usize) -> Vec<Vec<Operator>> {
+    let operators = Operator::iter().collect_vec();
 
-    let mut i = 0;
-    while i < n {
-        let op = Operator::iter().nth(i);
-        i += 1;
+    let mut result = Vec::new();
+    let mut current = vec![0; n];
+
+    loop {
+        result.push(current.iter().map(|&i| operators[i]).collect());
+
+        let mut i = n;
+        while i > 0 && current[i - 1] + 1 == operators.len() {
+            i -= 1;
+        }
+
+        if i == 0 {
+            break;
+        }
+
+        current[i - 1] += 1;
+
+        for j in i..n {
+            current[j] = 0;
+        }
     }
 
-    buf
+    result
 }
 
 pub fn equasion_is_valid(eq: &Equasion) -> bool {
     let (answer, values) = eq;
+    let operators = generate_combinations(values.len() - 1);
 
-    // let operator_amount = values.len() - 1;
-    // let operator_combinations = {
-    //
-    //     for i in 0..operator_amount {
-    //         let op =
-    //     }
-    //
-    //     buf
-    // };
+    for combination in operators.iter() {
+        let mut buf = values.clone();
+        let mut i = 0;
+        while i < &operators.len() - 1 {
+            let curr = buf[i];
 
-    // let curr_value = values.first().unwrap();
-    // let next_value = values.get(1).unwrap();
-    //
-    // for op in Operator::iter() {
-    //     let calculated = op.apply(curr_value, next_value);
-    //     dbg!(calculated, answer, calculated == *answer);
-    //     if op.apply(curr_value, next_value) == *answer {
-    //         return true
-    //     }
-    // }
+            if i + 1 == buf.len() {
+                break;
+            }
+
+            let next = buf[i + 1];
+            let res = combination[i].apply(&curr, &next);
+            if &res > answer {
+                i += 1;
+                continue;
+            }
+            buf[i + 1] = res;
+            i += 1
+        }
+
+        // dbg!(&buf);
+        if buf.last().unwrap() == answer {
+            return true;
+        }
+    }
 
     false
 }
 
-pub fn solve(input: Input) -> u32 {
+pub fn solve(input: Input) -> u64 {
     let mut ans = 0;
 
     for eq in input {

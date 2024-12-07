@@ -1,5 +1,5 @@
 use super::*;
 
-pub fn solve(input: Input) -> u32 {
+pub fn solve(input: Input) -> u64 {
     0
 }
