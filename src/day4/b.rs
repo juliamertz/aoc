@@ -27,5 +27,5 @@ pub fn solve(input: Input) -> u32 {
         }
     }
 
-   dbg!(ans) 
+    dbg!(ans)
 }

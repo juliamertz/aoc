@@ -1,8 +1,4 @@
-use std::{
-    fmt::{Debug, Display},
-    sync::{Arc, Mutex},
-    thread::JoinHandle,
-};
+use std::fmt::{Debug, Display};
 
 pub use anyhow::Result;
 pub use itertools::Itertools;
@@ -54,4 +50,3 @@ impl<T> Grid<T> {
         self.lines.get(y).and_then(|l| l.get(x))
     }
 }
-

@@ -1,5 +1,5 @@
-use super::*;
 use super::a::is_safe;
+use super::*;
 
 pub fn solve(reports: Vec<Report>) -> usize {
     reports

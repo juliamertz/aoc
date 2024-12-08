@@ -9,14 +9,16 @@ pub struct Input {
 }
 
 impl Input {
-    pub fn get(&self,pos: Pos) -> Option<&char> {
-        let (x,y) = pos;
+    pub fn get(&self, pos: Pos) -> Option<&char> {
+        let (x, y) = pos;
         self.content.get(y).and_then(|line| line.get(x))
     }
 }
 
 pub fn parse_input(input: &str) -> Input {
-    Input { content: input.lines().map(|l| l.chars().collect_vec()).collect_vec() }
+    Input {
+        content: input.lines().map(|l| l.chars().collect_vec()).collect_vec(),
+    }
 }
 
 // #[cfg(test)]
