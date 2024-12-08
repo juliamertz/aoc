@@ -6,7 +6,7 @@ pub use super::*;
 pub type Input = Vec<Equasion>;
 pub type Equasion = (u64, Vec<u64>);
 
-#[derive(Debug, strum_macros::EnumIter, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum Operator {
     Add,
     Multiply,

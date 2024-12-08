@@ -4,7 +4,7 @@ use strum::IntoEnumIterator;
 
 type WordPos = Vec<Pos>;
 
-#[derive(strum_macros::EnumIter)]
+#[derive(EnumIter)]
 pub enum Direction {
     Up,
     Down,

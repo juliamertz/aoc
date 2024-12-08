@@ -11,11 +11,8 @@ use std::time::{Duration, Instant};
 
 pub use tools::*;
 
-const DAYS_AMOUNT: usize = 25;
-
-lazy_static::lazy_static! {
-    pub static ref NUM_THREADS: usize = std::env::var("NUM_THREADS").unwrap_or("24".into()).parse().unwrap();
-}
+/// To speed up any nasty brute forces...
+const NUM_THREADS: usize = 24;
 
 fn main() -> anyhow::Result<()> {
     let args = std::env::args().skip(1).collect_vec();
@@ -23,7 +20,7 @@ fn main() -> anyhow::Result<()> {
     match args.iter().map(|f| f.as_str()).collect_vec().as_slice() {
         ["solve", day_number, part] => {
             let day_number: usize = day_number.parse()?;
-            if day_number > DAYS_AMOUNT {
+            if day_number > 25 {
                 anyhow::bail!("No such day {day_number}")
             }
 

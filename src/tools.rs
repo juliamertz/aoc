@@ -1,8 +1,13 @@
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    sync::{Arc, Mutex},
+};
 
 pub use anyhow::Result;
 pub use itertools::Itertools;
 pub use strum_macros::EnumIter;
+
+use crate::NUM_THREADS;
 
 pub fn regex(pattern: impl AsRef<str>) -> regex::Regex {
     regex::Regex::new(pattern.as_ref()).unwrap()
@@ -49,4 +54,44 @@ impl<T> Grid<T> {
         let (x, y) = pos;
         self.lines.get(y).and_then(|l| l.get(x))
     }
+}
+
+pub fn parallel_accumulate<T, U, F>(data: Vec<T>, shared_accumulator: U, task: F) -> U
+where
+    T: Send + 'static + Clone,
+    U: Send + 'static,
+    F: Fn(Vec<T>, Arc<Mutex<U>>) + Send + Sync + 'static,
+{
+    // Split the data into chunks based on the number of threads
+    let chunks = data
+        .chunks(data.len().div_ceil(NUM_THREADS))
+        .map(|chunk| chunk.to_vec())
+        .collect::<Vec<_>>();
+
+    // Wrap the accumulator in Arc<Mutex>
+    let shared = Arc::new(Mutex::new(shared_accumulator));
+    let task = Arc::new(task);
+
+    // Spawn threads
+    let handles: Vec<_> = chunks
+        .into_iter()
+        .map(|chunk| {
+            let shared = Arc::clone(&shared);
+            let task = Arc::clone(&task);
+            std::thread::spawn(move || {
+                task(chunk, shared);
+            })
+        })
+        .collect();
+
+    // Wait for all threads to finish
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    // Return the accumulated value
+    Arc::try_unwrap(shared)
+        .unwrap_or_else(|_| panic!("Failed to unwrap Arc"))
+        .into_inner()
+        .unwrap_or_else(|_| panic!("Failed to unwrap Mutex"))
 }

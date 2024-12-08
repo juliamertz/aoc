@@ -1,30 +1,14 @@
-use strum::IntoEnumIterator;
-
 use super::*;
 use a::*;
 
 pub fn solve(input: Input) -> u64 {
-    let mut ans = 0;
-    let operators = Operator::iter().collect_vec();
+    let operators = &[Operator::Add, Operator::Multiply, Operator::Concat];
 
-    for eq in input {
-        let (answer, values) = eq.clone();
-
-        let concatted: u64 = values
-            .iter()
-            .map(|v| v.to_string())
-            .join("")
-            .parse()
-            .unwrap();
-        if answer == concatted {
-            ans += answer;
-            continue;
+    parallel_accumulate(input, 0, move |data, acc| {
+        for eq in data {
+            if equasion_is_valid(&eq, operators) {
+                *acc.lock().unwrap() += eq.0;
+            }
         }
-
-        if equasion_is_valid(&eq, &operators) {
-            ans += eq.0;
-        };
-    }
-
-    dbg!(ans)
+    })
 }

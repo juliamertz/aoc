@@ -1,9 +1,6 @@
 use super::*;
 use a::{find_guard, walk_path, Guard};
-use std::{
-    collections::HashSet,
-    sync::{Arc, Mutex},
-};
+use std::collections::HashSet;
 
 // I'm truly ashamed of what i did here today
 
@@ -81,42 +78,16 @@ pub fn solve(board: Board) -> usize {
         .filter(|p| *p != start.unwrap().0)
         .collect_vec();
 
-    // i am speed 😎
-    let count = Arc::new(Mutex::new(0));
-    let threads_amount = 24;
+    parallel_accumulate(possible_positions, 0, move |data, acc| {
+        for pos in data {
+            let mut board = board.clone();
+            board.set(pos, Tile::Obstacle(true)).unwrap();
 
-    let parts: Vec<Vec<Pos>> = possible_positions
-        .chunks(possible_positions.len() / threads_amount)
-        .map(|s| s.into())
-        .collect();
-
-    let mut threads = vec![];
-
-    for part in parts {
-        let board = board.clone();
-        let count = count.clone();
-
-        let handle = std::thread::spawn(move || {
-            for pos in part {
-                let mut board = board.clone();
-                board.set(pos, Tile::Obstacle(true)).unwrap();
-
-                if is_loop(board) {
-                    let mut count = count.lock().expect("mutex poisoned");
-                    *count += 1;
-                    dbg!(*count);
-                }
+            if is_loop(board) {
+                let mut count = acc.lock().unwrap();
+                *count += 1;
+                dbg!(*count);
             }
-        });
-
-        threads.push(handle);
-    }
-
-    threads
-        .into_iter()
-        .for_each(|handle| handle.join().unwrap());
-
-    let ans = count.lock().unwrap();
-
-    dbg!(*ans as usize)
+        }
+    })
 }
