@@ -24,6 +24,12 @@ pub struct Grid<T> {
     pub lines: Vec<Vec<T>>,
 }
 
+impl<T> From<Vec<Vec<T>>> for Grid<T> {
+    fn from(value: Vec<Vec<T>>) -> Self {
+        Grid::new(value)
+    }
+}
+
 impl<T> Display for Grid<T>
 where
     T: Display,
@@ -54,6 +60,33 @@ impl<T> Grid<T> {
         let (x, y) = pos;
         self.lines.get(y).and_then(|l| l.get(x))
     }
+}
+
+pub fn generate_combinations<T: Clone>(n: usize, values: &[T]) -> Vec<Vec<T>> {
+    let mut result = Vec::new();
+    let mut current = vec![0; n];
+
+    loop {
+        result.push(current.iter().map(|&i| values[i].clone()).collect());
+
+        let mut i = n;
+        while i > 0 && current[i - 1] + 1 == values.len() {
+            i -= 1;
+        }
+
+        if i == 0 {
+            break;
+        }
+
+        current[i - 1] += 1;
+
+        #[allow(clippy::needless_range_loop)]
+        for j in i..n {
+            current[j] = 0;
+        }
+    }
+
+    result
 }
 
 pub fn parallel_accumulate<T, U, F>(data: Vec<T>, shared_accumulator: U, task: F) -> U

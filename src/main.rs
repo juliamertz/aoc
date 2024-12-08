@@ -5,6 +5,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 pub mod tools;
 use std::time::{Duration, Instant};
@@ -33,6 +34,7 @@ fn main() -> anyhow::Result<()> {
                 5 => solve!(day5, part),
                 6 => solve!(day6, part),
                 7 => solve!(day7, part),
+                8 => solve!(day8, part),
                 _ => unimplemented!(),
             };
         }
@@ -56,7 +58,7 @@ macro_rules! solve_part {
 #[macro_export]
 macro_rules! solve {
     ($day:ident,$part:tt) => {{
-        let path = format!("src/{}/input.txt", stringify!($day));
+        let path = format!("src/{}/input.test.txt", stringify!($day));
         let content = std::fs::read_to_string(path).unwrap();
         let input = $day::parse_input(&content);
 
