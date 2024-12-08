@@ -9,7 +9,7 @@ lazy_static! {
     static ref do_dont_re: Regex = Regex::new(r#"(do\(\)|don't\(\))"#).unwrap();
 }
 
-pub fn solve(input: Input) -> u32 {
+pub fn solve(input: &str) -> u32 {
     let mut res = 0;
     let mut enabled = true;
     let captures = mul_re.find_iter(input).collect_vec();

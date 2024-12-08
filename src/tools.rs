@@ -1,15 +1,12 @@
-mod day1;
-mod day2;
-mod day3;
-mod day4;
-mod day5;
-mod day6;
-mod day7;
-
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    sync::{Arc, Mutex},
+    thread::JoinHandle,
+};
 
 pub use anyhow::Result;
 pub use itertools::Itertools;
+pub use strum_macros::EnumIter;
 
 pub fn regex(pattern: impl AsRef<str>) -> regex::Regex {
     regex::Regex::new(pattern.as_ref()).unwrap()
@@ -23,7 +20,7 @@ pub type Pos = (usize, usize);
 
 #[derive(Debug, Clone)]
 pub struct Grid<T> {
-    lines: Vec<Vec<T>>,
+    pub lines: Vec<Vec<T>>,
 }
 
 impl<T> Display for Grid<T>
@@ -39,11 +36,11 @@ where
 }
 
 impl<T> Grid<T> {
-    fn new(cells: Vec<Vec<T>>) -> Grid<T> {
+    pub fn new(cells: Vec<Vec<T>>) -> Grid<T> {
         Grid { lines: cells }
     }
 
-    fn set(&mut self, (x, y): Pos, val: T) -> Result<()> {
+    pub fn set(&mut self, (x, y): Pos, val: T) -> Result<()> {
         if self.get((x, y)).is_none() {
             anyhow::bail!("No such tile")
         }
@@ -52,8 +49,9 @@ impl<T> Grid<T> {
         Ok(())
     }
 
-    fn get(&self, pos: Pos) -> Option<&T> {
+    pub fn get(&self, pos: Pos) -> Option<&T> {
         let (x, y) = pos;
         self.lines.get(y).and_then(|l| l.get(x))
     }
 }
+

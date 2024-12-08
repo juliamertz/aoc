@@ -2,7 +2,10 @@ pub mod a;
 pub mod b;
 
 pub use super::*;
-pub type Input = &'static str;
+
+pub fn parse_input(input: &str) -> &str {
+    input
+}
 
 #[cfg(test)]
 mod test {
@@ -11,7 +14,7 @@ mod test {
     #[test]
     fn part_a() {
         let input = include_str!("./input.txt");
-        assert_eq!(a::solve(input).unwrap(), 175700056);
+        assert_eq!(a::solve(input), 175700056);
     }
 
     #[test]

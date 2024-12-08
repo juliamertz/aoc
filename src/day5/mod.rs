@@ -8,7 +8,7 @@ pub type OrderingRules = Vec<Rule>;
 pub type Update = Vec<u32>;
 pub type Input = (OrderingRules, Vec<Update>);
 
-fn parse_input(input: &str) -> Input {
+pub fn parse_input(input: &str) -> Input {
     let split = input.split("\n\n").collect_vec();
 
     let rules = split

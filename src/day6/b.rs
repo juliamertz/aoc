@@ -104,6 +104,7 @@ pub fn solve(board: Board) -> usize {
                 if is_loop(board) {
                     let mut count = count.lock().expect("mutex poisoned");
                     *count += 1;
+                    dbg!(*count);
                 }
             }
         });
@@ -111,10 +112,11 @@ pub fn solve(board: Board) -> usize {
         threads.push(handle);
     }
 
-    for t in threads.into_iter() {
-        t.join().unwrap();
-    }
+    threads
+        .into_iter()
+        .for_each(|handle| handle.join().unwrap());
 
-    let ans = count.lock().expect("mutex poisoned");
+    let ans = count.lock().unwrap();
+
     dbg!(*ans as usize)
 }

@@ -1,5 +1,3 @@
-use strum::IntoEnumIterator;
-
 use super::*;
 
 fn generate_permutations(n: usize, operators: &[Operator]) -> Vec<Vec<Operator>> {
@@ -20,6 +18,7 @@ fn generate_permutations(n: usize, operators: &[Operator]) -> Vec<Vec<Operator>>
 
         current[i - 1] += 1;
 
+        #[allow(clippy::needless_range_loop)]
         for j in i..n {
             current[j] = 0;
         }

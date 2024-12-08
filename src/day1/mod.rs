@@ -4,7 +4,7 @@ pub mod b;
 pub use super::*;
 pub type Input = (Vec<u32>, Vec<u32>);
 
-fn parse_input(input: &str) -> Input {
+pub fn parse_input(input: &str) -> Input {
     input
         .lines()
         .map(|l| {
