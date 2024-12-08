@@ -7,7 +7,8 @@ pub use super::*;
 
 pub type Input = Grid<Tile>;
 pub type Frequency = char;
-#[derive(Debug)]
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Tile {
     Antenna(Frequency),
     Antinode,

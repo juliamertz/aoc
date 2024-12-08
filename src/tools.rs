@@ -1,5 +1,6 @@
 use std::{
     fmt::{Debug, Display},
+    hash::Hash,
     sync::{Arc, Mutex},
 };
 
@@ -18,6 +19,33 @@ pub fn num(pattern: &str) -> u32 {
 }
 
 pub type Pos = (usize, usize);
+
+#[derive(Debug)]
+pub struct Vertex(Pos, Pos);
+
+impl Vertex {
+    pub fn contains(&self, val: Pos) -> bool {
+        self.0 == val || self.1 == val
+    }
+}
+
+impl From<(Pos, Pos)> for Vertex {
+    fn from((a, b): (Pos, Pos)) -> Self {
+        Vertex(a, b)
+    }
+}
+
+impl From<Vertex> for (Pos, Pos) {
+    fn from(v: Vertex) -> (Pos, Pos) {
+        (v.0, v.1)
+    }
+}
+
+impl PartialEq for Vertex {
+    fn eq(&self, other: &Self) -> bool {
+        self.contains(other.0) && self.contains(other.1)
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Grid<T> {
@@ -68,6 +96,36 @@ pub fn generate_combinations<T: Clone>(n: usize, values: &[T]) -> Vec<Vec<T>> {
 
     loop {
         result.push(current.iter().map(|&i| values[i].clone()).collect());
+
+        let mut i = n;
+        while i > 0 && current[i - 1] + 1 == values.len() {
+            i -= 1;
+        }
+
+        if i == 0 {
+            break;
+        }
+
+        current[i - 1] += 1;
+
+        #[allow(clippy::needless_range_loop)]
+        for j in i..n {
+            current[j] = 0;
+        }
+    }
+
+    result
+}
+
+pub fn generate_unique_combinations<T: Clone + Eq + Hash>(n: usize, values: &[T]) -> Vec<Vec<T>> {
+    let mut result = Vec::new();
+    let mut current = vec![0; n];
+
+    loop {
+        let comb = current.iter().map(|&i| values[i].clone()).collect_vec();
+        if comb.iter().all_unique() {
+            result.push(comb);
+        }
 
         let mut i = n;
         while i > 0 && current[i - 1] + 1 == values.len() {
