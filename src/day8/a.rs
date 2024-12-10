@@ -20,7 +20,7 @@ pub fn get_vertices(points: &[Pos]) -> Vec<Vertex> {
 }
 
 pub fn solve(input: Input) -> u32 {
-    println!("{}", input);
+    // println!("{}", input);
 
     let mut antennas_by_frequency = HashMap::<char, Vec<Pos>>::new();
 
@@ -28,7 +28,7 @@ pub fn solve(input: Input) -> u32 {
     for (y, line) in input.lines.iter().enumerate() {
         for (x, tile) in line.iter().enumerate() {
             if let Tile::Antenna(ch) = tile {
-                let pos = (x, y);
+                let pos = (x, y).into();
                 let exists = antennas_by_frequency.contains_key(ch);
                 if !exists {
                     antennas_by_frequency.insert(*ch, vec![pos]);
@@ -44,47 +44,60 @@ pub fn solve(input: Input) -> u32 {
         .map(|(frequency, positions)| (frequency, get_vertices(positions)))
         .collect::<HashMap<_, _>>();
 
-    dbg!(&combinations);
-
     let mut grid = input.clone();
     let mut ans = 0;
 
-    // calculate x/y offset
-    for (frequency, combinations) in combinations {
-        // i think theres some silly mistake in here
+    for (_frequency, combinations) in combinations {
         for positions in combinations {
             let (a, b) = positions.into();
-            let x_offset = a.0.abs_diff(b.0);
-            let y_offset = a.1.abs_diff(b.1);
+            let x_offset = a.x.abs_diff(b.x);
+            let y_offset = a.y.abs_diff(b.y);
 
             if x_offset == 0 && y_offset == 0 {
                 continue;
             }
 
-            dbg!(frequency, a, b, x_offset, y_offset);
-
-            if x_offset > a.0 || y_offset > a.1 {
+            if x_offset > a.x || y_offset > a.y {
                 continue;
             }
 
-            let neg_offset_postion = (a.0 - x_offset, a.1 - y_offset);
-            if grid.get(neg_offset_postion).is_some() {
-                grid.set(neg_offset_postion, Tile::Antinode).unwrap();
-                ans += 1;
-            }
+            let mut place_antinode = |pos: Pos| {
+                if grid.get(pos).is_some() {
+                    grid.set(pos, Tile::Antinode).unwrap();
+                    ans += 1;
+                }
+            };
 
-            let pos_offset_postion = (b.0 + x_offset, b.1 + y_offset);
-            if grid.get(pos_offset_postion).is_some() {
-                grid.set(pos_offset_postion, Tile::Antinode).unwrap();
-                ans += 1;
-            }
+            let mut colormap = HashMap::new();
+            colormap.insert(a, "green");
+            colormap.insert(b, "green");
+
+            let (neg_offset_position, pos_offset_position) = if a.y < b.y && a.x < b.x {
+                let neg_offset = |pos: Pos| (pos.x - x_offset, pos.y - y_offset);
+                let pos_offset = |pos: Pos| (pos.x + x_offset, pos.y + y_offset);
+
+                (neg_offset(a).into(), pos_offset(b).into())
+            } else {
+                let neg_offset = |pos: Pos| (pos.x - x_offset, pos.y + y_offset);
+                let pos_offset = |pos: Pos| (pos.x + x_offset, pos.y - y_offset);
+
+                (pos_offset(a).into(), neg_offset(b).into())
+            };
+
+            place_antinode(neg_offset_position);
+            place_antinode(pos_offset_position);
+
+            colormap.insert(pos_offset_position, "red");
+            colormap.insert(neg_offset_position, "red");
+
+            // println!(
+            //     "frequency: {frequency}, a: {a:?}, b: {b:?}, x_offset: {x_offset}, y: {y_offset}"
+            // );
+            // grid.print_colored(colormap);
         }
     }
 
     println!("{}", grid);
-    println!("ans = {ans}");
 
-    // place antinode at both antenna's + offset (if in bounds)
-
-    10
+    dbg!(ans)
 }
