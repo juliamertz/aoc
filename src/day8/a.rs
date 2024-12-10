@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use super::*;
 
@@ -47,7 +47,8 @@ pub fn solve(input: Input) -> u32 {
     dbg!(&combinations);
 
     let mut grid = input.clone();
-    let mut ans = 0;
+
+    let mut placed_antinodes = HashSet::<Pos>::new();
 
     for (frequency, combinations) in combinations {
         for vertex in combinations {
@@ -71,7 +72,8 @@ pub fn solve(input: Input) -> u32 {
                             grid.set(pos, Tile::Antinode).unwrap();
                         }
                         colormap.insert(pos, "red");
-                        ans += 1;
+                        // ans += 1;
+                        placed_antinodes.insert(pos);
                     }
                 }
             };
@@ -97,13 +99,14 @@ pub fn solve(input: Input) -> u32 {
             };
 
             println!(
-                "frequency: {frequency}, a: {a:?}, b: {b:?}, x_offset: {x_offset}, y: {y_offset}, count: {ans}"
+                "frequency: {frequency}, a: {a:?}, b: {b:?}, x_offset: {x_offset}, y: {y_offset}, count: {}", placed_antinodes.len()
             );
             grid.print_colored(colormap);
         }
     }
 
     println!("{}", grid);
+    let ans = placed_antinodes.len();
 
-    dbg!(ans)
+    dbg!(ans as u32)
 }
