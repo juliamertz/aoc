@@ -19,26 +19,29 @@ pub fn get_vertices(points: &[Pos]) -> Vec<Vertex> {
     buf
 }
 
-pub fn solve(input: Input) -> u32 {
-    // println!("{}", input);
-
-    let mut antennas_by_frequency = HashMap::<char, Vec<Pos>>::new();
+pub fn find_antennas(input: &Input) -> HashMap<char, Vec<Pos>> {
+    let mut buf = HashMap::new();
 
     // Find all matching frequencies and their positions
     for (y, line) in input.lines.iter().enumerate() {
         for (x, tile) in line.iter().enumerate() {
             if let Tile::Antenna(ch) = tile {
                 let pos = (x, y).into();
-                let exists = antennas_by_frequency.contains_key(ch);
+                let exists = buf.contains_key(ch);
                 if !exists {
-                    antennas_by_frequency.insert(*ch, vec![pos]);
+                    buf.insert(*ch, vec![pos]);
                 } else {
-                    antennas_by_frequency.get_mut(ch).unwrap().push(pos);
+                    buf.get_mut(ch).unwrap().push(pos);
                 }
             }
         }
     }
 
+    buf
+}
+
+pub fn solve(input: Input) -> u32 {
+    let antennas_by_frequency = find_antennas(&input);
     let combinations = antennas_by_frequency
         .iter()
         .map(|(frequency, positions)| (frequency, get_vertices(positions)))

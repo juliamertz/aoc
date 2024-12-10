@@ -19,22 +19,23 @@ fn main() -> anyhow::Result<()> {
     let args = std::env::args().skip(1).collect_vec();
 
     match args.iter().map(|f| f.as_str()).collect_vec().as_slice() {
-        ["solve", day_number, part] => {
+        ["solve", day_number, part, test] => {
             let day_number: usize = day_number.parse()?;
             if day_number > 25 {
                 anyhow::bail!("No such day {day_number}")
             }
 
+            let test = *test == "true";
             let part = part.to_owned();
             match day_number {
-                1 => solve!(day1, part),
-                2 => solve!(day2, part),
-                3 => solve!(day3, part),
-                4 => solve!(day4, part),
-                5 => solve!(day5, part),
-                6 => solve!(day6, part),
-                7 => solve!(day7, part),
-                8 => solve!(day8, part),
+                1 => solve!(day1, part, test),
+                2 => solve!(day2, part, test),
+                3 => solve!(day3, part, test),
+                4 => solve!(day4, part, test),
+                5 => solve!(day5, part, test),
+                6 => solve!(day6, part, test),
+                7 => solve!(day7, part, test),
+                8 => solve!(day8, part, test),
                 _ => unimplemented!(),
             };
         }
@@ -57,8 +58,12 @@ macro_rules! solve_part {
 
 #[macro_export]
 macro_rules! solve {
-    ($day:ident,$part:tt) => {{
-        let path = format!("src/{}/input.test.txt", stringify!($day));
+    ($day:ident,$part:tt,$test:expr) => {{
+        let path = if $test {
+            format!("src/{}/input.test.txt", stringify!($day))
+        } else {
+            format!("src/{}/input.txt", stringify!($day))
+        };
         let content = std::fs::read_to_string(path).unwrap();
         let input = $day::parse_input(&content);
 
