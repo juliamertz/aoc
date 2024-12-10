@@ -64,7 +64,7 @@ pub fn solve(board: Board) -> usize {
         for (x, tile) in line.iter().enumerate() {
             match tile {
                 Tile::Visited | Tile::Guard(_) => {
-                    possible_positions.push((x, y));
+                    possible_positions.push((x, y).into());
                 }
                 _ => continue,
             };

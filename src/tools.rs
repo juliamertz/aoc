@@ -1,10 +1,12 @@
 use std::{
+    collections::HashMap,
     fmt::{Debug, Display},
     hash::Hash,
     sync::{Arc, Mutex},
 };
 
 pub use anyhow::Result;
+use colored::Colorize;
 pub use itertools::Itertools;
 pub use strum_macros::EnumIter;
 
@@ -18,7 +20,32 @@ pub fn num(pattern: &str) -> u32 {
     pattern.parse().unwrap()
 }
 
-pub type Pos = (usize, usize);
+// pub type Pos = (usize, usize);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Pos {
+    pub x: usize,
+    pub y: usize,
+}
+
+impl Pos {
+    /// get absolute difference for x and y co-ordinate respectively
+    pub fn abs_diff(&self, other: Self) -> (usize, usize) {
+        (self.x.abs_diff(other.x), self.y.abs_diff(other.y))
+    }
+}
+
+impl From<(usize, usize)> for Pos {
+    fn from((x, y): (usize, usize)) -> Self {
+        Pos { x, y }
+    }
+}
+
+impl From<Pos> for (usize, usize) {
+    fn from(pos: Pos) -> (usize, usize) {
+        (pos.x, pos.y)
+    }
+}
 
 #[derive(Debug)]
 pub struct Vertex(Pos, Pos);
@@ -52,7 +79,7 @@ pub struct Grid<T> {
     pub lines: Vec<Vec<T>>,
 }
 
-impl<T> From<Vec<Vec<T>>> for Grid<T> {
+impl<T: Display> From<Vec<Vec<T>>> for Grid<T> {
     fn from(value: Vec<Vec<T>>) -> Self {
         Grid::new(value)
     }
@@ -70,13 +97,29 @@ where
     }
 }
 
-impl<T> Grid<T> {
+impl<T: Display> Grid<T> {
     pub fn new(cells: Vec<Vec<T>>) -> Grid<T> {
         Grid { lines: cells }
     }
 
-    pub fn set(&mut self, (x, y): Pos, val: T) -> Result<()> {
-        if self.get((x, y)).is_none() {
+    pub fn print_colored(&self, colors: HashMap<Pos, impl ToString>) {
+        for (y, line) in self.lines.iter().enumerate() {
+            for (x, cell) in line.iter().enumerate() {
+                if let Some(color) = colors.get(&(x, y).into()) {
+                    print!("{} ", cell.to_string().color(color.to_string()))
+                } else {
+                    print!("{} ", cell)
+                }
+            }
+            println!()
+        }
+        println!()
+    }
+
+    pub fn set(&mut self, pos: Pos, val: T) -> Result<()> {
+        let (x, y) = pos.into();
+
+        if self.get((x, y).into()).is_none() {
             anyhow::bail!("No such tile")
         }
         self.lines[y][x] = val;
@@ -85,7 +128,7 @@ impl<T> Grid<T> {
     }
 
     pub fn get(&self, pos: Pos) -> Option<&T> {
-        let (x, y) = pos;
+        let (x, y) = pos.into();
         self.lines.get(y).and_then(|l| l.get(x))
     }
 }

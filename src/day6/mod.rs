@@ -5,7 +5,6 @@ use std::{fmt::Display, str::FromStr};
 
 pub use super::*;
 
-pub type Pos = (usize, usize);
 pub type Board = Grid<Tile>;
 pub type Placed = bool;
 
@@ -55,13 +54,14 @@ impl Orientation {
         }
     }
 
-    pub fn move_pos(&self, (x, y): Pos) -> Option<Pos> {
+    pub fn move_pos(&self, pos: Pos) -> Option<Pos> {
+        let (x,y) = pos.into();
         Some(match self {
             Self::Up => (x, y.checked_sub(1)?),
             Self::Down => (x, y + 1),
             Self::Left => (x.checked_sub(1)?, y),
             Self::Right => (x + 1, y),
-        })
+        }.into())
     }
 }
 

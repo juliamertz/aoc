@@ -6,7 +6,7 @@ pub fn find_guard(board: &Board) -> Option<(Pos, Orientation)> {
     for (y, line) in board.lines.iter().enumerate() {
         for (x, tile) in line.iter().enumerate() {
             match tile {
-                Tile::Guard(o) => return Some(((x, y), *o)),
+                Tile::Guard(o) => return Some(((x, y).into(), *o)),
                 _ => continue,
             };
         }

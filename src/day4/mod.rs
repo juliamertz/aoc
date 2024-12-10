@@ -3,14 +3,13 @@ pub mod b;
 
 pub use super::*;
 
-pub type Pos = (usize, usize);
 pub struct Input {
     content: Vec<Vec<char>>,
 }
 
 impl Input {
     pub fn get(&self, pos: Pos) -> Option<&char> {
-        let (x, y) = pos;
+        let (x, y) = pos.into();
         self.content.get(y).and_then(|line| line.get(x))
     }
 }

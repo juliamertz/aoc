@@ -1,12 +1,12 @@
 use super::*;
 
 fn check_xmas(input: &Input, pos: Pos) -> Option<()> {
-    let (x, y) = pos;
+    let (x, y) = pos.into();
 
-    let top_right = input.get((x + 1, y + 1));
-    let top_left = input.get((x.checked_sub(1)?, y + 1));
-    let bottom_right = input.get((x + 1, y.checked_sub(1)?));
-    let bottom_left = input.get((x.checked_sub(1)?, y.checked_sub(1)?));
+    let top_right = input.get((x + 1, y + 1).into());
+    let top_left = input.get((x.checked_sub(1)?, y + 1).into());
+    let bottom_right = input.get((x + 1, y.checked_sub(1)?).into());
+    let bottom_left = input.get((x.checked_sub(1)?, y.checked_sub(1)?).into());
 
     let check = |a, b| match (a, b) {
         (Some(&'M'), Some(&'S')) | (Some(&'S'), Some(&'M')) => Some(()),
@@ -21,7 +21,7 @@ pub fn solve(input: Input) -> u32 {
 
     for (y, line) in input.content.iter().enumerate() {
         for (x, ch) in line.iter().enumerate() {
-            if *ch == 'A' && check_xmas(&input, (x, y)).is_some() {
+            if *ch == 'A' && check_xmas(&input, (x, y).into()).is_some() {
                 ans += 1;
             }
         }

@@ -18,17 +18,20 @@ pub enum Direction {
 
 impl Direction {
     fn step(&self, pos: &Pos) -> Option<Pos> {
-        let (x, y) = pos;
-        Some(match self {
-            Self::Up => (*x, y.checked_sub(1)?),
-            Self::Down => (*x, y + 1),
-            Self::Left => (x.checked_sub(1)?, *y),
-            Self::Right => (x + 1, *y),
-            Self::DiagTopLeft => (x.checked_sub(1)?, y.checked_sub(1)?),
-            Self::DiagTopRight => (x + 1, y.checked_sub(1)?),
-            Self::DiagBottomLeft => (x.checked_sub(1)?, y + 1),
-            Self::DiagBottomRight => (x + 1, y + 1),
-        })
+        let (x, y) = (*pos).into();
+        Some(
+            match self {
+                Self::Up => (x, y.checked_sub(1)?),
+                Self::Down => (x, y + 1),
+                Self::Left => (x.checked_sub(1)?, y),
+                Self::Right => (x + 1, y),
+                Self::DiagTopLeft => (x.checked_sub(1)?, y.checked_sub(1)?),
+                Self::DiagTopRight => (x + 1, y.checked_sub(1)?),
+                Self::DiagBottomLeft => (x.checked_sub(1)?, y + 1),
+                Self::DiagBottomRight => (x + 1, y + 1),
+            }
+            .into(),
+        )
     }
 }
 
@@ -42,12 +45,7 @@ fn match_word_from_positions(indeces: &WordPos, input: &Input, word: &str) -> bo
     true
 }
 
-fn search_word_2d(
-    pos: (usize, usize),
-    direction: Direction,
-    word: &str,
-    input: &Input,
-) -> Option<WordPos> {
+fn search_word_2d(pos: Pos, direction: Direction, word: &str, input: &Input) -> Option<WordPos> {
     let mut indeces: Vec<Pos> = vec![];
     let word_chars = word.split("").filter(|ch| !ch.is_empty());
 
@@ -76,7 +74,9 @@ pub fn solve(input: Input) -> usize {
     for (line_no, line) in input.content.iter().enumerate() {
         for (ch_no, _ch) in line.iter().enumerate() {
             for direction in Direction::iter() {
-                if let Some(res) = search_word_2d((ch_no, line_no), direction, "XMAS", &input) {
+                if let Some(res) =
+                    search_word_2d((ch_no, line_no).into(), direction, "XMAS", &input)
+                {
                     indeces.push(res);
                 }
             }
