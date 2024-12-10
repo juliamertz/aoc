@@ -110,6 +110,14 @@ impl<T: Display> Grid<T> {
         Grid { lines: cells }
     }
 
+    pub fn width(&self) -> usize {
+        self.lines[0].len()
+    }
+
+    pub fn height(&self) -> usize {
+        self.lines.len()
+    }
+
     pub fn print_colored(&self, colors: HashMap<Pos, impl ToString>) {
         for (y, line) in self.lines.iter().enumerate() {
             for (x, cell) in line.iter().enumerate() {
