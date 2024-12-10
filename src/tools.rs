@@ -29,6 +29,10 @@ pub struct Pos {
 }
 
 impl Pos {
+    pub fn new(x: usize, y: usize) -> Self {
+        Self { x, y }
+    }
+
     /// get absolute difference for x and y co-ordinate respectively
     pub fn abs_diff(&self, other: Self) -> (usize, usize) {
         (self.x.abs_diff(other.x), self.y.abs_diff(other.y))
@@ -47,10 +51,14 @@ impl From<Pos> for (usize, usize) {
     }
 }
 
-#[derive(Debug)]
-pub struct Vertex(Pos, Pos);
+#[derive(Debug, Clone, Copy, Eq)]
+pub struct Vertex(pub Pos, pub Pos);
 
 impl Vertex {
+    pub fn new(a: Pos, b: Pos) -> Self {
+        Self(a, b)
+    }
+
     pub fn contains(&self, val: Pos) -> bool {
         self.0 == val || self.1 == val
     }
@@ -105,7 +113,8 @@ impl<T: Display> Grid<T> {
     pub fn print_colored(&self, colors: HashMap<Pos, impl ToString>) {
         for (y, line) in self.lines.iter().enumerate() {
             for (x, cell) in line.iter().enumerate() {
-                if let Some(color) = colors.get(&(x, y).into()) {
+                let curr_pos: Pos = (x, y).into();
+                if let Some(color) = colors.get(&curr_pos) {
                     print!("{} ", cell.to_string().color(color.to_string()))
                 } else {
                     print!("{} ", cell)
