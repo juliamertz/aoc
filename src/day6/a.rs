@@ -18,7 +18,7 @@ pub fn find_guard(board: &Board) -> Option<(Pos, Orientation)> {
 pub fn tick(mut board: Board, guard: Guard) -> Option<(Board, Guard)> {
     let (pos, orientation) = guard?;
 
-    let orientation = match board.get(orientation.move_pos(pos)?) {
+    let orientation = match board.get(&orientation.move_pos(pos)?) {
         Some(&Tile::Obstacle(_)) => orientation.rotate_right(),
         _ => orientation,
     };

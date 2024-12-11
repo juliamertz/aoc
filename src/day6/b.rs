@@ -10,7 +10,7 @@ pub fn tick(mut board: Board, guard: Guard) -> Option<(Board, Guard)> {
     let mut done_rotating = false;
     let mut next_orientation = orientation;
     while !done_rotating {
-        next_orientation = match board.get(next_orientation.move_pos(pos)?) {
+        next_orientation = match board.get(&next_orientation.move_pos(pos)?) {
             Some(&Tile::Obstacle(_)) => next_orientation.rotate_right(),
             _ => {
                 done_rotating = true;

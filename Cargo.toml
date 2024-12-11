@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.94"
+argh = "0.1.12"
 colored = "2.1.0"
 itertools = "0.13.0"
 lazy_static = "1.5.0"

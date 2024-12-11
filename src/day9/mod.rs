@@ -4,16 +4,19 @@ pub mod b;
 pub use super::*;
 pub type Input = Vec<Block>;
 
-pub type Id = u64;
-pub type Size = usize;
-
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Block {
-    Free(Size),
-    File(Id, Size),
+    Free(usize),
+    File {
+        id: u64,
+        size: usize,
+        start: usize,
+        end: usize,
+    },
 }
 
 pub fn parse_input(input: &str) -> Vec<Block> {
+    let mut bits = 0;
     let mut id = 0;
     dbg!(&input);
     input
@@ -21,12 +24,19 @@ pub fn parse_input(input: &str) -> Vec<Block> {
         .chars()
         .enumerate()
         .map(|(i, ch)| {
-            let val: Size = ch.to_string().parse().unwrap();
+            let size = ch.to_string().parse().unwrap();
             let is_even = i % 2 == 0;
             let block = match is_even {
-                true => Block::File(id, val),
-                false => Block::Free(val),
+                true => Block::File {
+                    id,
+                    size,
+                    start: bits,
+                    end: bits + size,
+                },
+                false => Block::Free(size),
             };
+
+            bits += size;
 
             if is_even {
                 id += 1;

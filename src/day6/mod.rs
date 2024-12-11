@@ -55,13 +55,16 @@ impl Orientation {
     }
 
     pub fn move_pos(&self, pos: Pos) -> Option<Pos> {
-        let (x,y) = pos.into();
-        Some(match self {
-            Self::Up => (x, y.checked_sub(1)?),
-            Self::Down => (x, y + 1),
-            Self::Left => (x.checked_sub(1)?, y),
-            Self::Right => (x + 1, y),
-        }.into())
+        let (x, y) = pos.into();
+        Some(
+            match self {
+                Self::Up => (x, y.checked_sub(1)?),
+                Self::Down => (x, y + 1),
+                Self::Left => (x.checked_sub(1)?, y),
+                Self::Right => (x + 1, y),
+            }
+            .into(),
+        )
     }
 }
 

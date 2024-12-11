@@ -8,40 +8,64 @@ mod day7;
 mod day8;
 mod day9;
 
-pub mod tools;
-use std::time::{Duration, Instant};
+mod day10;
+mod day11;
 
+use argh::{FromArgValue, FromArgs};
+use std::sync::OnceLock;
+use std::time::{Duration, Instant};
+use strum_macros::Display;
+
+pub mod tools;
 pub use tools::*;
 
-/// To speed up any nasty brute forces...
-const NUM_THREADS: usize = 24;
+#[derive(FromArgs)]
+/// Festive pain
+struct Cli {
+    /// to speed up any nasty brute forces...
+    #[argh(option)]
+    threads: Option<usize>,
+
+    /// whether or not to use test input
+    #[argh(switch, short = 't')]
+    test: bool,
+
+    #[argh(positional)]
+    day: u8,
+
+    #[argh(positional)]
+    part: Part,
+}
+
+pub static NUM_THREADS: OnceLock<usize> = OnceLock::new();
+
+fn init_globals(args: &Cli) {
+    _ = NUM_THREADS.set(args.threads.unwrap_or(24));
+}
 
 fn main() -> anyhow::Result<()> {
-    let args = std::env::args().skip(1).collect_vec();
+    let args: Cli = argh::from_env();
+    init_globals(&args);
 
-    match args.iter().map(|f| f.as_str()).collect_vec().as_slice() {
-        ["solve", day_number, part, test] => {
-            let day_number: usize = day_number.parse()?;
-            if day_number > 25 {
-                anyhow::bail!("No such day {day_number}")
-            }
+    let (part, test, day) = (args.part, args.test, args.day);
+    if day > 25 {
+        anyhow::bail!("No such day {}", args.day)
+    }
 
-            let test = *test == "true";
-            let part = part.to_owned();
-            match day_number {
-                1 => solve!(day1, part, test),
-                2 => solve!(day2, part, test),
-                3 => solve!(day3, part, test),
-                4 => solve!(day4, part, test),
-                5 => solve!(day5, part, test),
-                6 => solve!(day6, part, test),
-                7 => solve!(day7, part, test),
-                8 => solve!(day8, part, test),
-                9 => solve!(day9, part, test),
-                _ => unimplemented!(),
-            };
-        }
-        _ => anyhow::bail!("what"),
+    match day {
+        1 => solve!(day1, part, test),
+        2 => solve!(day2, part, test),
+        3 => solve!(day3, part, test),
+        4 => solve!(day4, part, test),
+        5 => solve!(day5, part, test),
+        6 => solve!(day6, part, test),
+        7 => solve!(day7, part, test),
+        8 => solve!(day8, part, test),
+        9 => solve!(day9, part, test),
+        10 => solve!(day10, part, test),
+        11 => solve!(day11, part, test),
+
+        _ => unimplemented!(),
     };
 
     Ok(())
@@ -51,9 +75,8 @@ fn main() -> anyhow::Result<()> {
 macro_rules! solve_part {
     ($part:expr, $day:ident, $input:expr) => {
         match $part {
-            "a" => $day::a::solve($input).to_string(),
-            "b" => $day::b::solve($input).to_string(),
-            _ => unimplemented!(),
+            Part::A => $day::a::solve($input).to_string(),
+            Part::B => $day::b::solve($input).to_string(),
         }
     };
 }
@@ -92,5 +115,22 @@ fn fmt_duration(duration: Duration) -> String {
         format!("{} μs", micros)
     } else {
         format!("{} ns", nanos)
+    }
+}
+
+#[derive(EnumIter, Display)]
+#[strum(serialize_all = "lowercase")]
+pub enum Part {
+    A,
+    B,
+}
+
+impl FromArgValue for Part {
+    fn from_arg_value(value: &str) -> std::result::Result<Self, String> {
+        match value.to_string().to_lowercase().as_str() {
+            "a" => Ok(Part::A),
+            "b" => Ok(Part::B),
+            _ => Err("Choose from either A or B".into()),
+        }
     }
 }

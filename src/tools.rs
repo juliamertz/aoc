@@ -21,6 +21,18 @@ pub fn num(pattern: &str) -> u32 {
     pattern.parse().unwrap()
 }
 
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl Direction {
+    pub const ALL: [Self; 4] = [Self::Left, Self::Right, Self::Up, Self::Down];
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Pos {
     pub x: usize,
@@ -35,6 +47,18 @@ impl Pos {
     /// get absolute difference for x and y co-ordinate respectively
     pub fn abs_diff(&self, other: Self) -> (usize, usize) {
         (self.x.abs_diff(other.x), self.y.abs_diff(other.y))
+    }
+
+    pub fn to(&self, dir: Direction) -> Option<Self> {
+        Some(
+            match dir {
+                Direction::Up => (self.x, self.y.checked_sub(1)?),
+                Direction::Down => (self.x, self.y + 1),
+                Direction::Left => (self.x.checked_sub(1)?, self.y),
+                Direction::Right => (self.x + 1, self.y),
+            }
+            .into(),
+        )
     }
 }
 
@@ -133,19 +157,16 @@ impl<T: Display> Grid<T> {
     }
 
     pub fn set(&mut self, pos: Pos, val: T) -> Result<()> {
-        let (x, y) = pos.into();
-
-        if self.get((x, y).into()).is_none() {
+        if self.get(&pos).is_none() {
             anyhow::bail!("No such tile")
         }
-        self.lines[y][x] = val;
+        self.lines[pos.y][pos.x] = val;
 
         Ok(())
     }
 
-    pub fn get(&self, pos: Pos) -> Option<&T> {
-        let (x, y) = pos.into();
-        self.lines.get(y).and_then(|l| l.get(x))
+    pub fn get(&self, pos: &Pos) -> Option<&T> {
+        self.lines.get(pos.y).and_then(|l| l.get(pos.x))
     }
 }
 
@@ -214,7 +235,7 @@ where
 {
     // Split the data into chunks based on the number of threads
     let chunks = data
-        .chunks(data.len().div_ceil(NUM_THREADS))
+        .chunks(data.len().div_ceil(*NUM_THREADS.get().unwrap()))
         .map(|chunk| chunk.to_vec())
         .collect::<Vec<_>>();
 

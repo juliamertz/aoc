@@ -69,7 +69,7 @@ pub fn solve(input: Input) -> u32 {
             colormap.insert(b, "green");
 
             let mut place_antinode = |pos: Pos| {
-                if let Some(tile) = grid.get(pos) {
+                if let Some(tile) = grid.get(&pos) {
                     if *tile != Tile::Antinode {
                         if *tile == Tile::Empty {
                             grid.set(pos, Tile::Antinode).unwrap();

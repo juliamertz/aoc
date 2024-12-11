@@ -1,4 +1,3 @@
-
 use super::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,7 +24,7 @@ pub fn expand_blocks(blocks: &[Block]) -> Vec<Bit> {
 
     for block in blocks {
         match block {
-            Block::File(id, size) => {
+            Block::File { id, size, .. } => {
                 for _ in 0..*size {
                     buf.push(Bit::Block(*id));
                 }
@@ -51,9 +50,8 @@ pub fn compact_bits(mut bits: Vec<Bit>) -> Vec<Bit> {
     // TODO: this seems inefficient
     // edit: it sure is...
     fn is_sorted(bits: &[Bit]) -> bool {
-        for idx in first_empty(bits).unwrap()..bits.len() - 1 {
-            dbg!(idx);
-            if bits[idx] != Bit::Empty {
+        for bit in bits[first_empty(bits).unwrap()..bits.len() - 1].iter() {
+            if *bit != Bit::Empty {
                 return false;
             }
         }
@@ -91,15 +89,11 @@ pub fn checksum(bits: Vec<Bit>) -> u64 {
         dbg!(position);
         match bit {
             Bit::Block(id) => ans += id * (position as u64),
-            Bit::Empty => break,
+            Bit::Empty => continue,
         }
     }
 
     ans
-}
-
-pub fn fmt_bits(val: &[Bit]) -> String {
-    val.iter().map(|b| b.to_string()).join("")
 }
 
 pub fn solve(input: Input) -> u64 {
@@ -108,18 +102,4 @@ pub fn solve(input: Input) -> u64 {
     let compacted = compact_bits(expanded);
     let ans = checksum(compacted);
     dbg!(ans)
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn expand_bits() {
-        let input = parse_input("2333133121414131402");
-        assert_eq!(
-            fmt_bits(&expand_blocks(&input)),
-            "00...111...2...333.44.5555.6666.777.888899"
-        );
-    }
 }
