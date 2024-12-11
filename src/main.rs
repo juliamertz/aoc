@@ -6,6 +6,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 
 pub mod tools;
 use std::time::{Duration, Instant};
@@ -36,6 +37,7 @@ fn main() -> anyhow::Result<()> {
                 6 => solve!(day6, part, test),
                 7 => solve!(day7, part, test),
                 8 => solve!(day8, part, test),
+                9 => solve!(day9, part, test),
                 _ => unimplemented!(),
             };
         }

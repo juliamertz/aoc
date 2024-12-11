@@ -1,13 +1,14 @@
+use colored::Colorize;
 use std::{
     collections::HashMap,
-    fmt::{Debug, Display},
+    fmt::Debug,
     hash::Hash,
     sync::{Arc, Mutex},
 };
 
 pub use anyhow::Result;
-use colored::Colorize;
 pub use itertools::Itertools;
+pub use std::fmt::Display;
 pub use strum_macros::EnumIter;
 
 use crate::NUM_THREADS;
@@ -19,8 +20,6 @@ pub fn regex(pattern: impl AsRef<str>) -> regex::Regex {
 pub fn num(pattern: &str) -> u32 {
     pattern.parse().unwrap()
 }
-
-// pub type Pos = (usize, usize);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Pos {
