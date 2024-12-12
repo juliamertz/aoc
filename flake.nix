@@ -59,8 +59,8 @@
             inherit nativeBuildInputs;
 
             packages = [
-              (pkgs.writeShellScriptBin "solve" ''
-                cargo run -- solve $@
+              (pkgs.writeShellScriptBin "run" ''
+                cargo run -- $@
               '')
             ];
 

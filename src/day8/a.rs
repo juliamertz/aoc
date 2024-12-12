@@ -104,7 +104,7 @@ pub fn solve(input: Input) -> u32 {
             println!(
                 "frequency: {frequency}, a: {a:?}, b: {b:?}, x_offset: {x_offset}, y: {y_offset}, count: {}", placed_antinodes.len()
             );
-            grid.print_colored(colormap);
+            grid.print_colored(&colormap);
         }
     }
 

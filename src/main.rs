@@ -10,6 +10,7 @@ mod day9;
 
 mod day10;
 mod day11;
+mod day12;
 
 use argh::{FromArgValue, FromArgs};
 use std::sync::OnceLock;
@@ -20,7 +21,7 @@ pub mod tools;
 pub use tools::*;
 
 #[derive(FromArgs)]
-/// Festive pain
+/// Festive pain 🥳😭
 struct Cli {
     /// to speed up any nasty brute forces...
     #[argh(option)]
@@ -64,6 +65,8 @@ fn main() -> anyhow::Result<()> {
         9 => solve!(day9, part, test),
         10 => solve!(day10, part, test),
         11 => solve!(day11, part, test),
+        12 => solve!(day12, part, test),
+        
 
         _ => unimplemented!(),
     };

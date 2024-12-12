@@ -74,7 +74,7 @@ impl From<Pos> for (usize, usize) {
     }
 }
 
-#[derive(Debug, Clone, Copy, Eq)]
+#[derive(Debug, Clone, Copy, Eq, Hash)]
 pub struct Vertex(pub Pos, pub Pos);
 
 impl Vertex {
@@ -141,7 +141,23 @@ impl<T: Display> Grid<T> {
         self.lines.len()
     }
 
-    pub fn print_colored(&self, colors: HashMap<Pos, impl ToString>) {
+    pub fn positions_iter(&self) -> Vec<Pos> {
+        (0..self.height())
+            .flat_map(|y| (0..self.width()).map(|x| Pos { x, y }).collect_vec())
+            .collect_vec()
+    }
+
+    pub fn print(&self) {
+        for line in self.lines.iter() {
+            for cell in line.iter() {
+                print!("{} ", cell)
+            }
+            println!()
+        }
+        println!()
+    }
+
+    pub fn print_colored(&self, colors: &HashMap<Pos, impl ToString>) {
         for (y, line) in self.lines.iter().enumerate() {
             for (x, cell) in line.iter().enumerate() {
                 let curr_pos: Pos = (x, y).into();
