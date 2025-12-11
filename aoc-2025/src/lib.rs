@@ -1,5 +1,6 @@
 pub mod day1;
 pub mod day2;
+pub mod day3;
 
 pub use aoc_common::*;
 
@@ -15,6 +16,7 @@ pub fn solve_day(day: u8, part: Part, test: bool) -> anyhow::Result<String> {
     let ans = match day {
         1 => solve_part!(part, day1, content),
         2 => solve_part!(part, day2, content),
+        3 => solve_part!(part, day3, content),
         _ => anyhow::bail!("Day {} not implemented", day),
     };
     
