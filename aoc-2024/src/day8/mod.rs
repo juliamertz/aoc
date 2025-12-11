@@ -1,8 +1,6 @@
 pub mod a;
 pub mod b;
 
-use std::fmt::Display;
-
 pub use super::*;
 
 pub type Input = Grid<Tile>;

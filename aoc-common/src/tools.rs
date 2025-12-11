@@ -3,7 +3,7 @@ use std::{
     collections::HashMap,
     fmt::Debug,
     hash::Hash,
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex, OnceLock},
 };
 
 pub use anyhow::Result;
@@ -11,7 +11,15 @@ pub use itertools::Itertools;
 pub use std::fmt::Display;
 pub use strum_macros::EnumIter;
 
-use crate::NUM_THREADS;
+pub static NUM_THREADS: OnceLock<usize> = OnceLock::new();
+
+pub fn init_num_threads(threads: usize) {
+    _ = NUM_THREADS.set(threads);
+}
+
+pub fn get_num_threads() -> usize {
+    *NUM_THREADS.get().unwrap_or(&24)
+}
 
 pub fn regex(pattern: impl AsRef<str>) -> regex::Regex {
     regex::Regex::new(pattern.as_ref()).unwrap()
@@ -249,9 +257,10 @@ where
     U: Send + 'static,
     F: Fn(Vec<T>, Arc<Mutex<U>>) + Send + Sync + 'static,
 {
+    let num_threads = get_num_threads();
     // Split the data into chunks based on the number of threads
     let chunks = data
-        .chunks(data.len().div_ceil(*NUM_THREADS.get().unwrap()))
+        .chunks(data.len().div_ceil(num_threads))
         .map(|chunk| chunk.to_vec())
         .collect::<Vec<_>>();
 
@@ -282,3 +291,4 @@ where
         .into_inner()
         .unwrap_or_else(|_| panic!("Failed to unwrap Mutex"))
 }
+

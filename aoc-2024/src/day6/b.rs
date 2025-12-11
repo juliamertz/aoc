@@ -86,7 +86,6 @@ pub fn solve(board: Board) -> usize {
             if is_loop(board) {
                 let mut count = acc.lock().unwrap();
                 *count += 1;
-                dbg!(*count);
             }
         }
     })

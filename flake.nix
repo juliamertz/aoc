@@ -10,80 +10,75 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs =
-    { nixpkgs, flake-parts, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = {
+    nixpkgs,
+    flake-parts,
+    ...
+  } @ inputs:
+    flake-parts.lib.mkFlake {inherit inputs;} {
       systems = nixpkgs.lib.systems.flakeExposed;
 
-      perSystem =
-        {
-          config,
-          pkgs,
-          lib,
-          system,
-          ...
-        }:
-        let
-          nativeBuildInputs =
-            with pkgs;
-            [
-              pkg-config
-              rustPlatform.bindgenHook
-            ]
-            ++ lib.optionals stdenv.isDarwin [ makeBinaryWrapper ];
-          buildInputs =
-            with pkgs;
-            [ openssl ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ IOKit ]);
+      perSystem = {
+        config,
+        pkgs,
+        lib,
+        system,
+        ...
+      }: let
+        nativeBuildInputs = with pkgs;
+          [
+            pkg-config
+            rustPlatform.bindgenHook
+          ]
+          ++ lib.optionals stdenv.isDarwin [makeBinaryWrapper];
+        buildInputs = with pkgs; [openssl];
+      in {
+        packages.default = let
+          manifest = (lib.importTOML ./Cargo.toml).package;
         in
-        {
-          packages.default =
-            let
-              manifest = (lib.importTOML ./Cargo.toml).package;
-            in
-            pkgs.rustPlatform.buildRustPackage {
-              inherit buildInputs nativeBuildInputs;
-              inherit (manifest)
-                name
-                version
-                ;
+          pkgs.rustPlatform.buildRustPackage {
+            inherit buildInputs nativeBuildInputs;
+            inherit
+              (manifest)
+              name
+              version
+              ;
 
-              src = ./.;
-              cargoLock = {
-                lockFile = ./Cargo.lock;
-                allowBuiltinFetchGit = true;
-              };
-              meta.mainProgram = manifest.name;
+            src = ./.;
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+              allowBuiltinFetchGit = true;
             };
-          devShells.default = pkgs.mkShell {
-            name = "dev-shell";
-            inherit nativeBuildInputs;
-
-            packages = [
-              (pkgs.writeShellScriptBin "run" ''
-                cargo run -- $@
-              '')
-            ];
-
-            buildInputs =
-              let
-                overlays = [ (import inputs.rust-overlay) ];
-                pkgs = import (inputs.nixpkgs) { inherit system overlays; };
-              in
-              buildInputs
-              ++ (with pkgs.rust-bin; [
-                (stable.latest.minimal.override {
-                  extensions = [
-                    "clippy"
-                    "rust-src"
-                  ];
-                })
-
-                nightly.latest.clippy
-                nightly.latest.rustfmt
-                nightly.latest.rust-analyzer
-              ]);
+            meta.mainProgram = manifest.name;
           };
+        devShells.default = pkgs.mkShell {
+          name = "dev-shell";
+          inherit nativeBuildInputs;
 
+          packages = [
+            (pkgs.writeShellScriptBin "run" ''
+              cargo run -- $@
+            '')
+          ];
+
+          buildInputs = let
+            overlays = [(import inputs.rust-overlay)];
+            pkgs = import (inputs.nixpkgs) {inherit system overlays;};
+          in
+            buildInputs
+            ++ (with pkgs.rust-bin; [
+              (stable.latest.minimal.override {
+                extensions = [
+                  "clippy"
+                  "rust-src"
+                ];
+              })
+
+              nightly.latest.clippy
+              nightly.latest.rustfmt
+              nightly.latest.rust-analyzer
+            ]);
         };
+      };
     };
 }

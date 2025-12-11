@@ -1,7 +1,7 @@
 pub mod a;
 pub mod b;
 
-use std::{fmt::Display, str::FromStr};
+use std::str::FromStr;
 
 pub use super::*;
 

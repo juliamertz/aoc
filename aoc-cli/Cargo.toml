@@ -1,0 +1,21 @@
+[package]
+name = "aoc-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "aoc"
+path = "src/main.rs"
+
+[dependencies]
+aoc-2024 = { path = "../aoc-2024" }
+aoc-2025 = { path = "../aoc-2025" }
+aoc-common = { path = "../aoc-common" }
+anyhow = "1.0.94"
+argh = "0.1.12"
+strum_macros = "0.26.4"
+
+
+
+
+
