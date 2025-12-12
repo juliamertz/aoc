@@ -13,21 +13,14 @@ pub type Removed = bool;
 pub enum Tile {
     #[default]
     Empty,
-    Roll(Removed),
-}
-
-impl Tile {
-    pub fn is_empty(&self) -> bool {
-        matches!(self, Self::Empty | Self::Roll(true))
-    }
+    Roll,
 }
 
 impl Display for Tile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             Self::Empty => ".",
-            Self::Roll(false) => "@",
-            Self::Roll(true) => "x",
+            Self::Roll => "@",
         })
     }
 }
@@ -38,7 +31,7 @@ impl FromStr for Tile {
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Ok(match s {
             "." => Self::Empty,
-            "@" => Self::Roll(Default::default()),
+            "@" => Self::Roll,
             _ => return Err(anyhow!("invalid tile: '{s}'")),
         })
     }

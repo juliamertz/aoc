@@ -32,7 +32,7 @@ pub fn solve(mut input: Input) -> u64 {
             .filter_map(|pos| {
                 pos.and_then(|pos| {
                     let tile = input.get(&pos);
-                    if matches!(tile, Some(&Tile::Roll(_))) {
+                    if matches!(tile, Some(&Tile::Roll)) {
                         Some(pos)
                     } else {
                         None
@@ -45,7 +45,7 @@ pub fn solve(mut input: Input) -> u64 {
             sum += 1;
 
             let as_mut = input.get_mut(&pos).unwrap();
-            *as_mut = Tile::Roll(true);
+            *as_mut = Tile::Empty;
         };
     }
 
