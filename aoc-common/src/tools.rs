@@ -192,6 +192,10 @@ impl<T: Display> Grid<T> {
     pub fn get(&self, pos: &Pos) -> Option<&T> {
         self.lines.get(pos.y).and_then(|l| l.get(pos.x))
     }
+
+    pub fn get_mut(&mut self, pos: &Pos) -> Option<&mut T> {
+        self.lines.get_mut(pos.y).and_then(|l| l.get_mut(pos.x))
+    }
 }
 
 pub fn generate_combinations<T: Clone>(n: usize, values: &[T]) -> Vec<Vec<T>> {
@@ -291,4 +295,3 @@ where
         .into_inner()
         .unwrap_or_else(|_| panic!("Failed to unwrap Mutex"))
 }
-
